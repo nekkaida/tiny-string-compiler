@@ -9,11 +9,6 @@ This project implements a simple **toy compiler** using **Lex** and **Yacc** (Fl
 - [Features](#features)
 - [Supported Operations](#supported-operations)
 - [Installation](#installation)
-- [How to Use](#how-to-use)
-- [Examples](#examples)
-- [Project Structure](#project-structure)
-- [Future Enhancements](#future-enhancements)
-- [Acknowledgments](#acknowledgments)
 
 ---
 
