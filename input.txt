@@ -1,0 +1,9 @@
+s1 = "hello";
+s2 = "world";
+s3 = s1 + " " + s2;
+s4 = reverse(s3);
+s5 = "openai";
+len = length(s3);
+pal = palindrome("madam");
+substr = substring(s3, 0, 5);
+pal_test = palindrome(s5);
