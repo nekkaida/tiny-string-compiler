@@ -69,30 +69,36 @@
 /* First part of user prologue.  */
 #line 1 "string-compiler.y"
 
+/* Include standard C++ libraries needed for input/output and string manipulation. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+/* Define a maximum number of variables that can be stored. */
 #define MAX_VARS 100
 
+/* Declare the external variable for line numbers, used in error messages. */
 extern int yylineno;
 
+/* Define a structure to represent a variable, which has a name and a value. */
 struct var {
-    char* name;
-    char* value;
+    char* name;   /* Variable name */
+    char* value;  /* Variable value */
 };
 
+/* Declare an array to act as a simple symbol table for storing variables. */
 struct var vars[MAX_VARS];
-int var_count = 0;
+int var_count = 0;  /* Keep track of the number of variables stored */
 
+/* Function prototypes for managing variables and handling errors. */
 char* get_var_value(char* name);
 void set_var_value(char* name, char* value);
 
+/* Function prototypes for lexer and error reporting. */
 int yylex(void);
 void yyerror(const char *s);
 
-
-#line 96 "y.tab.c"
+#line 102 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -163,12 +169,12 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 26 "string-compiler.y"
+#line 33 "string-compiler.y"
 
-    char* sval;
-    int ival;
+    char* sval;  /* For string values */
+    int ival;    /* For integer values */
 
-#line 172 "y.tab.c"
+#line 178 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -595,10 +601,10 @@ static const yytype_int8 yytranslate[] =
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_int8 yyrline[] =
+static const yytype_uint8 yyrline[] =
 {
-       0,    41,    41,    42,    46,    50,    54,    61,    65,    72,
-      82,    86,    92,   102,   118
+       0,    51,    51,    52,    57,    62,    73,    83,    88,    97,
+     108,   113,   120,   131,   148
 };
 #endif
 
@@ -1174,131 +1180,147 @@ yyreduce:
   switch (yyn)
     {
   case 5: /* assignment: ID '=' expr  */
-#line 50 "string-compiler.y"
-                   { set_var_value((yyvsp[-2].sval), (yyvsp[0].sval)); free((yyvsp[-2].sval)); free((yyvsp[0].sval)); }
-#line 1180 "y.tab.c"
-    break;
-
-  case 6: /* expr: expr '+' term  */
-#line 54 "string-compiler.y"
-                     { 
-        char* tmp = malloc(strlen((yyvsp[-2].sval)) + strlen((yyvsp[0].sval)) + 1);
-        strcpy(tmp, (yyvsp[-2].sval));
-        strcat(tmp, (yyvsp[0].sval));
-        (yyval.sval) = tmp;
-        free((yyvsp[-2].sval)); free((yyvsp[0].sval));
+#line 62 "string-compiler.y"
+                   {
+        /* Store the variable and its value in the symbol table. */
+        set_var_value((yyvsp[-2].sval), (yyvsp[0].sval));
+        /* Free the memory allocated for the variable name and value. */
+        free((yyvsp[-2].sval));
+        free((yyvsp[0].sval));
     }
 #line 1192 "y.tab.c"
     break;
 
+  case 6: /* expr: expr '+' term  */
+#line 73 "string-compiler.y"
+                     {
+        /* Concatenate the two strings. */
+        char* tmp = malloc(strlen((yyvsp[-2].sval)) + strlen((yyvsp[0].sval)) + 1);
+        strcpy(tmp, (yyvsp[-2].sval));
+        strcat(tmp, (yyvsp[0].sval));
+        (yyval.sval) = tmp;  /* Set the result as the value of the expression */
+        /* Free the memory allocated for the operands. */
+        free((yyvsp[-2].sval));
+        free((yyvsp[0].sval));
+    }
+#line 1207 "y.tab.c"
+    break;
+
   case 7: /* expr: term  */
-#line 61 "string-compiler.y"
+#line 83 "string-compiler.y"
                     { (yyval.sval) = (yyvsp[0].sval); }
-#line 1198 "y.tab.c"
+#line 1213 "y.tab.c"
     break;
 
   case 8: /* term: STRING_LITERAL  */
-#line 65 "string-compiler.y"
-                       { 
-        /* Remove surrounding quotes */
+#line 88 "string-compiler.y"
+                       {
+        /* Remove the surrounding quotes from the string literal. */
         char* str = strdup((yyvsp[0].sval));
-        str[strlen(str)-1] = '\0';
-        (yyval.sval) = strdup(&str[1]);
-        free(str); free((yyvsp[0].sval));
+        str[strlen(str)-1] = '\0';       /* Remove the ending quote */
+        (yyval.sval) = strdup(&str[1]);            /* Remove the starting quote */
+        /* Free the temporary strings. */
+        free(str);
+        free((yyvsp[0].sval));
     }
-#line 1210 "y.tab.c"
+#line 1227 "y.tab.c"
     break;
 
   case 9: /* term: ID  */
-#line 72 "string-compiler.y"
-                       { 
+#line 97 "string-compiler.y"
+                       {
+        /* Retrieve the value of the variable from the symbol table. */
         char* val = get_var_value((yyvsp[0].sval));
         if (val) {
-            (yyval.sval) = strdup(val);
+            (yyval.sval) = strdup(val);  /* Set the variable's value as the term's value */
         } else {
-            yyerror("Undefined variable");
-            (yyval.sval) = strdup("");
+            yyerror("Undefined variable");  /* Report an error if the variable is not found */
+            (yyval.sval) = strdup("");  /* Set an empty string to prevent crashes */
         }
-        free((yyvsp[0].sval));
+        free((yyvsp[0].sval));  /* Free the memory allocated for the variable name */
     }
-#line 1225 "y.tab.c"
+#line 1243 "y.tab.c"
     break;
 
   case 10: /* term: function_call  */
-#line 82 "string-compiler.y"
+#line 108 "string-compiler.y"
                        { (yyval.sval) = (yyvsp[0].sval); }
-#line 1231 "y.tab.c"
+#line 1249 "y.tab.c"
     break;
 
   case 11: /* function_call: LENGTH '(' expr ')'  */
-#line 86 "string-compiler.y"
+#line 113 "string-compiler.y"
                            {
+        /* Calculate the length of the string and convert it to a string. */
         char buffer[20];
         sprintf(buffer, "%d", (int)strlen((yyvsp[-1].sval)));
-        (yyval.sval) = strdup(buffer);
-        free((yyvsp[-1].sval));
+        (yyval.sval) = strdup(buffer);  /* Set the length as the function's result */
+        free((yyvsp[-1].sval));             /* Free the memory allocated for the argument */
     }
-#line 1242 "y.tab.c"
+#line 1261 "y.tab.c"
     break;
 
   case 12: /* function_call: REVERSE '(' expr ')'  */
-#line 92 "string-compiler.y"
+#line 120 "string-compiler.y"
                             {
+        /* Reverse the input string. */
         int len = strlen((yyvsp[-1].sval));
         char* reversed = malloc(len +1);
         for(int i=0; i<len; i++){
-            reversed[i] = (yyvsp[-1].sval)[len - i -1];
+            reversed[i] = (yyvsp[-1].sval)[len - i -1];  /* Copy characters from the end to the start */
         }
-        reversed[len] = '\0';
-        (yyval.sval) = reversed;
-        free((yyvsp[-1].sval));
+        reversed[len] = '\0';  /* Null-terminate the reversed string */
+        (yyval.sval) = reversed;         /* Set the reversed string as the function's result */
+        free((yyvsp[-1].sval));              /* Free the memory allocated for the argument */
     }
-#line 1257 "y.tab.c"
+#line 1277 "y.tab.c"
     break;
 
   case 13: /* function_call: SUBSTRING '(' expr ',' NUMBER ',' NUMBER ')'  */
-#line 102 "string-compiler.y"
+#line 131 "string-compiler.y"
                                                    {
-        int start = (yyvsp[-3].ival);
-        int end = (yyvsp[-1].ival);
+        /* Extract a substring from the input string between 'start' and 'end' indices. */
+        int start = (yyvsp[-3].ival);  /* Starting index */
+        int end = (yyvsp[-1].ival);    /* Ending index */
         int len_str = strlen((yyvsp[-5].sval));
-        int len = end - start;
+        int len = end - start;  /* Length of the substring */
         if(len<0 || start<0 || end>len_str){
-            yyerror("Invalid substring indices");
-            (yyval.sval) = strdup("");
+            yyerror("Invalid substring indices");  /* Report an error if indices are invalid */
+            (yyval.sval) = strdup("");  /* Set an empty string to prevent crashes */
         } else {
             char* substr = malloc(len +1);
-            strncpy(substr, (yyvsp[-5].sval) + start, len);
-            substr[len] = '\0';
-            (yyval.sval) = substr;
+            strncpy(substr, (yyvsp[-5].sval) + start, len);  /* Copy the substring */
+            substr[len] = '\0';                /* Null-terminate the substring */
+            (yyval.sval) = substr;  /* Set the substring as the function's result */
         }
-        free((yyvsp[-5].sval));
+        free((yyvsp[-5].sval));  /* Free the memory allocated for the input string */
     }
-#line 1278 "y.tab.c"
+#line 1299 "y.tab.c"
     break;
 
   case 14: /* function_call: PALINDROME '(' expr ')'  */
-#line 118 "string-compiler.y"
+#line 148 "string-compiler.y"
                               {
+        /* Check if the input string is a palindrome. */
         int len = strlen((yyvsp[-1].sval));
-        int is_palindrome = 1;
+        int is_palindrome = 1;  /* Flag to indicate if it's a palindrome */
         for(int i=0; i<len/2; i++){
             if((yyvsp[-1].sval)[i] != (yyvsp[-1].sval)[len - i -1]){
-                is_palindrome = 0;
+                is_palindrome = 0;  /* Set flag to 0 if characters don't match */
                 break;
             }
         }
         if(is_palindrome)
-            (yyval.sval) = strdup("true");
+            (yyval.sval) = strdup("true");   /* Set result to "true" */
         else
-            (yyval.sval) = strdup("false");
-        free((yyvsp[-1].sval));
+            (yyval.sval) = strdup("false");  /* Set result to "false" */
+        free((yyvsp[-1].sval));  /* Free the memory allocated for the input string */
     }
-#line 1298 "y.tab.c"
+#line 1320 "y.tab.c"
     break;
 
 
-#line 1302 "y.tab.c"
+#line 1324 "y.tab.c"
 
       default: break;
     }
@@ -1491,47 +1513,55 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 135 "string-compiler.y"
+#line 167 "string-compiler.y"
 
 
+/* Function to retrieve the value of a variable from the symbol table. */
 char* get_var_value(char* name) {
     for(int i=0; i<var_count; i++){
         if(strcmp(vars[i].name, name) == 0){
-            return vars[i].value;
+            return vars[i].value;  /* Return the value if the name matches */
         }
     }
-    return NULL;
+    return NULL;  /* Return NULL if the variable is not found */
 }
 
+/* Function to set the value of a variable in the symbol table. */
 void set_var_value(char* name, char* value) {
     for(int i=0; i<var_count; i++){
         if(strcmp(vars[i].name, name) == 0){
-            free(vars[i].value);
-            vars[i].value = strdup(value);
+            /* Update the value if the variable already exists. */
+            free(vars[i].value);  /* Free the old value */
+            vars[i].value = strdup(value);  /* Store the new value */
             return;
         }
     }
     if(var_count < MAX_VARS){
+        /* Add a new variable if there is space in the symbol table. */
         vars[var_count].name = strdup(name);
         vars[var_count].value = strdup(value);
         var_count++;
     } else {
-        yyerror("Variable limit reached");
+        yyerror("Variable limit reached");  /* Report an error if the table is full */
     }
 }
 
+/* Function to report parsing errors with line numbers. */
 void yyerror(const char *s) {
     fprintf(stderr, "Error at line %d: %s\n", yylineno, s);
 }
 
+/* The main function initializes the line number and starts the parsing process. */
 int main(void){
-    yylineno = 1;
-    yyparse();
+    yylineno = 1;  /* Initialize the line number */
+    yyparse();     /* Start parsing the input */
+    /* After parsing, print all variables and their values. */
     printf("Variables:\n");
     for(int i=0; i<var_count; i++){
         printf("%s = %s\n", vars[i].name, vars[i].value);
+        /* Free the memory allocated for variable names and values. */
         free(vars[i].name);
         free(vars[i].value);
     }
-    return 0;
+    return 0;  /* Exit the program */
 }

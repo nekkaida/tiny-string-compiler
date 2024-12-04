@@ -81,10 +81,10 @@ extern int yydebug;
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 26 "string-compiler.y"
+#line 33 "string-compiler.y"
 
-    char* sval;
-    int ival;
+    char* sval;  /* For string values */
+    int ival;    /* For integer values */
 
 #line 90 "y.tab.h"
 
