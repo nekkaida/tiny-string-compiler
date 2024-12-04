@@ -41,6 +41,8 @@ void yyerror(const char *s);
 %token <ival> NUMBER             /* NUMBER has an integer value */
 %token LENGTH REVERSE SUBSTRING PALINDROME  /* Tokens for string functions */
 %token TOUPPER TOLOWER PADLEFT PADRIGHT TRIM FIND  /* Tokens for new string functions */
+%token REPLACE SPLIT JOIN COUNT
+
 
 /* Declare the types of non-terminal symbols used in the grammar rules. */
 %type <sval> expr term function_call
@@ -272,6 +274,161 @@ function_call:
         }
         free($3);  /* Free the memory allocated for the haystack string */
         free($5);  /* Free the memory allocated for the needle string */
+    }
+    | REPLACE '(' expr ',' expr ',' expr ')' {
+        /* Replace occurrences of $5 in $3 with $7 */
+        char* source = $3;
+        char* old_substr = $5;
+        char* new_substr = $7;
+
+        /* Prepare for replacement */
+        int source_len = strlen(source);
+        int old_len = strlen(old_substr);
+        int new_len = strlen(new_substr);
+
+        if (old_len == 0) {
+            yyerror("Old substring for replace function cannot be empty");
+            $$ = strdup(source);  /* Return the original string */
+        } else {
+            /* Count the number of occurrences of old_substr in source */
+            int count = 0;
+            char* pos = source;
+            while ((pos = strstr(pos, old_substr)) != NULL) {
+                count++;
+                pos += old_len;
+            }
+
+            /* Calculate the maximum length of the result */
+            int max_result_len = source_len + count * (new_len - old_len) + 1;
+
+            char* result = malloc(max_result_len);
+            result[0] = '\0';
+
+            /* Now perform the replacement */
+            pos = source;
+            char* match;
+            while ((match = strstr(pos, old_substr)) != NULL) {
+                /* Copy part before match */
+                strncat(result, pos, match - pos);
+                /* Append new_substr */
+                strcat(result, new_substr);
+                /* Move position past the match */
+                pos = match + old_len;
+            }
+            /* Append remaining part */
+            strcat(result, pos);
+            $$ = result;
+        }
+        free($3);
+        free($5);
+        free($7);
+    }
+    | SPLIT '(' expr ',' STRING_LITERAL ')' {
+        /* Split $3 by the delimiter $5 and return a string with elements separated by spaces */
+        char* source = $3;
+        char* delim = $5;
+        delim[strlen(delim)-1] = '\0';         /* Remove ending quote */
+        char* delim_char = &delim[1];          /* Remove starting quote */
+
+        /* Duplicate the source string to avoid modifying the original */
+        char* temp_str = strdup(source);
+        char* token;
+        char* rest = temp_str;
+        /* Allocate initial result string */
+        char* result = malloc(1);
+        result[0] = '\0';
+        int result_size = 1;
+
+        /* Split the string */
+        while ((token = strtok_r(rest, delim_char, &rest))) {
+            /* Append token and a space */
+            result_size += strlen(token) + 1;
+            result = realloc(result, result_size);
+            strcat(result, token);
+            strcat(result, " ");
+        }
+        if (strlen(result) > 0) {
+            result[strlen(result)-1] = '\0'; /* Remove trailing space */
+        }
+        $$ = result;
+        free(temp_str);
+        free($3);
+        free($5);
+    }
+    | JOIN '(' expr ',' STRING_LITERAL ')' {
+        /* Join elements in $3 separated by spaces using separator $5 */
+        char* source = $3;
+        char* sep = $5;
+        sep[strlen(sep)-1] = '\0';         /* Remove ending quote */
+        char* sep_str = &sep[1];           /* Remove starting quote */
+
+        /* Duplicate the source string */
+        char* temp_str = strdup(source);
+        char* token;
+        char* rest = temp_str;
+
+        /* Count tokens */
+        int token_count = 0;
+        char* temp_str_copy = strdup(source);  /* Copy for counting tokens */
+        char* rest_copy = temp_str_copy;
+        while ((token = strtok_r(rest_copy, " ", &rest_copy))) {
+            token_count++;
+        }
+        free(temp_str_copy);
+
+        /* Allocate array to store tokens */
+        char** tokens = malloc(token_count * sizeof(char*));
+        int idx = 0;
+        rest = temp_str;  /* Reset rest pointer */
+        while ((token = strtok_r(rest, " ", &rest))) {
+            tokens[idx++] = strdup(token);
+        }
+
+        /* Calculate result size */
+        int result_size = 1; /* For null terminator */
+        for (int i = 0; i < idx; i++) {
+            result_size += strlen(tokens[i]) + ((i < idx - 1) ? strlen(sep_str) : 0);
+        }
+
+        /* Build the result string */
+        char* result = malloc(result_size);
+        result[0] = '\0';
+        for (int i = 0; i < idx; i++) {
+            strcat(result, tokens[i]);
+            if (i < idx - 1) {
+                strcat(result, sep_str);
+            }
+            free(tokens[i]); /* Free each token */
+        }
+        $$ = result;
+
+        /* Free allocated memory */
+        free(temp_str);
+        free(tokens);
+        free($3);
+        free($5);
+    }
+    | COUNT '(' expr ',' expr ')' {
+        /* Count occurrences of $5 in $3 */
+        char* source = $3;
+        char* substr = $5;
+        int count = 0;
+        char* pos = source;
+        int substr_len = strlen(substr);
+        if (substr_len == 0) {
+            yyerror("Substring for count function cannot be empty");
+            $$ = strdup("0");
+        } else {
+            while ((pos = strstr(pos, substr)) != NULL) {
+                count++;
+                pos += substr_len;
+            }
+            char buffer[20];
+            sprintf(buffer, "%d", count);
+            $$ = strdup(buffer);
+        }
+        free($3);
+        free($5);
     }
     ;
 

@@ -27,6 +27,10 @@ extern int yylineno;        // Declare the external line number variable
 "padright"         { return PADRIGHT; }     // Pad string on the right
 "trim"             { return TRIM; }         // Trim whitespace from both ends
 "find"             { return FIND; }         // Find substring within a string
+"replace"          { return REPLACE; }      // Add this line
+"split"            { return SPLIT; }        // Add this line
+"join"             { return JOIN; }         // Add this line
+"count"            { return COUNT; }        // Add this line
 
 [a-zA-Z_][a-zA-Z0-9_]*  { yylval.sval = strdup(yytext); return ID; }  // Identifiers
 

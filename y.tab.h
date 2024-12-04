@@ -66,7 +66,11 @@ extern int yydebug;
     PADLEFT = 267,                 /* PADLEFT  */
     PADRIGHT = 268,                /* PADRIGHT  */
     TRIM = 269,                    /* TRIM  */
-    FIND = 270                     /* FIND  */
+    FIND = 270,                    /* FIND  */
+    REPLACE = 271,                 /* REPLACE  */
+    SPLIT = 272,                   /* SPLIT  */
+    JOIN = 273,                    /* JOIN  */
+    COUNT = 274                    /* COUNT  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -88,6 +92,10 @@ extern int yydebug;
 #define PADRIGHT 268
 #define TRIM 269
 #define FIND 270
+#define REPLACE 271
+#define SPLIT 272
+#define JOIN 273
+#define COUNT 274
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
@@ -98,7 +106,7 @@ union YYSTYPE
     char* sval;  /* For string values */
     int ival;    /* For integer values */
 
-#line 102 "y.tab.h"
+#line 110 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;
