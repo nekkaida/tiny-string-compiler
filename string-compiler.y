@@ -475,7 +475,7 @@ int main(void){
     yylineno = 1;  /* Initialize the line number */
     yyparse();     /* Start parsing the input */
     /* After parsing, print all variables and their values. */
-    printf("Variables:\n");
+    printf("Output:\n");
     for(int i=0; i<var_count; i++){
         printf("%s = %s\n", vars[i].name, vars[i].value);
         /* Free the memory allocated for variable names and values. */
