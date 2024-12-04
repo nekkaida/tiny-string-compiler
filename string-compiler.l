@@ -21,6 +21,12 @@ extern int yylineno;        // Declare the external line number variable
 "reverse"          { return REVERSE; }      // Reverse function
 "substring"        { return SUBSTRING; }    // Substring function
 "palindrome"       { return PALINDROME; }   // Palindrome function
+"toupper"          { return TOUPPER; }      
+"tolower"          { return TOLOWER; }
+"padleft"          { return PADLEFT; }     
+"padright"         { return PADRIGHT; }    
+"trim"             { return TRIM; }        
+"find"             { return FIND; }        
 
 [a-zA-Z_][a-zA-Z0-9_]*  { yylval.sval = strdup(yytext); return ID; }  // Identifiers
 

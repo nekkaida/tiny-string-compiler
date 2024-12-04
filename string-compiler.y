@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 /* Define a maximum number of variables that can be stored. */
 #define MAX_VARS 100
@@ -39,6 +40,9 @@ void yyerror(const char *s);
 %token <sval> ID STRING_LITERAL  /* ID and STRING_LITERAL have string values */
 %token <ival> NUMBER             /* NUMBER has an integer value */
 %token LENGTH REVERSE SUBSTRING PALINDROME  /* Tokens for string functions */
+%token TOUPPER TOLOWER
+%token PADLEFT PADRIGHT TRIM
+%token FIND
 
 /* Declare the types of non-terminal symbols used in the grammar rules. */
 %type <sval> expr term function_call
@@ -160,6 +164,88 @@ function_call:
         else
             $$ = strdup("false");  /* Set result to "false" */
         free($3);  /* Free the memory allocated for the input string */
+    }
+    | TOUPPER '(' expr ')' {
+        int len = strlen($3);
+        char* upper_str = strdup($3);
+        for(int i = 0; i < len; i++) {
+            upper_str[i] = toupper(upper_str[i]);
+        }
+        $$ = upper_str;
+        free($3);
+    }
+    | TOLOWER '(' expr ')' {
+        int len = strlen($3);
+        char* lower_str = strdup($3);
+        for(int i = 0; i < len; i++) {
+            lower_str[i] = tolower(lower_str[i]);
+        }
+        $$ = lower_str;
+        free($3);
+    }
+    | PADLEFT '(' expr ',' NUMBER ',' STRING_LITERAL ')' {
+        int total_length = $5;
+        char pad_char = $7[1]; // Extract the character from the string literal
+        int str_len = strlen($3);
+        if(total_length <= str_len) {
+            $$ = strdup($3);
+        } else {
+            int pad_len = total_length - str_len;
+            char* padded_str = malloc(total_length + 1);
+            memset(padded_str, pad_char, pad_len);
+            strcpy(padded_str + pad_len, $3);
+            $$ = padded_str;
+        }
+        free($3);
+        free($7);
+    }
+    | PADRIGHT '(' expr ',' NUMBER ',' STRING_LITERAL ')' {
+        int total_length = $5;
+        char pad_char = $7[1];
+        int str_len = strlen($3);
+        if(total_length <= str_len) {
+            $$ = strdup($3);
+        } else {
+            int pad_len = total_length - str_len;
+            char* padded_str = malloc(total_length + 1);
+            strcpy(padded_str, $3);
+            memset(padded_str + str_len, pad_char, pad_len);
+            padded_str[total_length] = '\0';
+            $$ = padded_str;
+        }
+        free($3);
+        free($7);
+    }
+    | TRIM '(' expr ')' {
+        char* trimmed_str = strdup($3);
+        char* start = trimmed_str;
+        char* end = trimmed_str + strlen(trimmed_str) - 1;
+
+        // Trim leading whitespace
+        while(isspace((unsigned char)*start)) start++;
+
+        // Trim trailing whitespace
+        while(end > start && isspace((unsigned char)*end)) end--;
+        *(end + 1) = '\0';
+
+        $$ = strdup(start);
+        free(trimmed_str);
+        free($3);
+    }
+    | FIND '(' expr ',' expr ')' {
+        char* haystack = $3;
+        char* needle = $5;
+        char* pos = strstr(haystack, needle);
+        if(pos) {
+            int index = pos - haystack;
+            char buffer[20];
+            sprintf(buffer, "%d", index);
+            $$ = strdup(buffer);
+        } else {
+            $$ = strdup("-1");
+        }
+        free($3);
+        free($5);
     }
     ;
 

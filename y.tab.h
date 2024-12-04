@@ -60,7 +60,13 @@ extern int yydebug;
     LENGTH = 261,                  /* LENGTH  */
     REVERSE = 262,                 /* REVERSE  */
     SUBSTRING = 263,               /* SUBSTRING  */
-    PALINDROME = 264               /* PALINDROME  */
+    PALINDROME = 264,              /* PALINDROME  */
+    TOUPPER = 265,                 /* TOUPPER  */
+    TOLOWER = 266,                 /* TOLOWER  */
+    PADLEFT = 267,                 /* PADLEFT  */
+    PADRIGHT = 268,                /* PADRIGHT  */
+    TRIM = 269,                    /* TRIM  */
+    FIND = 270                     /* FIND  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -76,17 +82,23 @@ extern int yydebug;
 #define REVERSE 262
 #define SUBSTRING 263
 #define PALINDROME 264
+#define TOUPPER 265
+#define TOLOWER 266
+#define PADLEFT 267
+#define PADRIGHT 268
+#define TRIM 269
+#define FIND 270
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 33 "string-compiler.y"
+#line 34 "string-compiler.y"
 
     char* sval;  /* For string values */
     int ival;    /* For integer values */
 
-#line 90 "y.tab.h"
+#line 102 "y.tab.h"
 
 };
 typedef union YYSTYPE YYSTYPE;

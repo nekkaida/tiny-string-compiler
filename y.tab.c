@@ -73,6 +73,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 /* Define a maximum number of variables that can be stored. */
 #define MAX_VARS 100
@@ -98,7 +99,7 @@ void set_var_value(char* name, char* value);
 int yylex(void);
 void yyerror(const char *s);
 
-#line 102 "y.tab.c"
+#line 103 "y.tab.c"
 
 # ifndef YY_CAST
 #  ifdef __cplusplus
@@ -148,7 +149,13 @@ extern int yydebug;
     LENGTH = 261,                  /* LENGTH  */
     REVERSE = 262,                 /* REVERSE  */
     SUBSTRING = 263,               /* SUBSTRING  */
-    PALINDROME = 264               /* PALINDROME  */
+    PALINDROME = 264,              /* PALINDROME  */
+    TOUPPER = 265,                 /* TOUPPER  */
+    TOLOWER = 266,                 /* TOLOWER  */
+    PADLEFT = 267,                 /* PADLEFT  */
+    PADRIGHT = 268,                /* PADRIGHT  */
+    TRIM = 269,                    /* TRIM  */
+    FIND = 270                     /* FIND  */
   };
   typedef enum yytokentype yytoken_kind_t;
 #endif
@@ -164,17 +171,23 @@ extern int yydebug;
 #define REVERSE 262
 #define SUBSTRING 263
 #define PALINDROME 264
+#define TOUPPER 265
+#define TOLOWER 266
+#define PADLEFT 267
+#define PADRIGHT 268
+#define TRIM 269
+#define FIND 270
 
 /* Value type.  */
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 union YYSTYPE
 {
-#line 33 "string-compiler.y"
+#line 34 "string-compiler.y"
 
     char* sval;  /* For string values */
     int ival;    /* For integer values */
 
-#line 178 "y.tab.c"
+#line 191 "y.tab.c"
 
 };
 typedef union YYSTYPE YYSTYPE;
@@ -204,19 +217,25 @@ enum yysymbol_kind_t
   YYSYMBOL_REVERSE = 7,                    /* REVERSE  */
   YYSYMBOL_SUBSTRING = 8,                  /* SUBSTRING  */
   YYSYMBOL_PALINDROME = 9,                 /* PALINDROME  */
-  YYSYMBOL_10_ = 10,                       /* ';'  */
-  YYSYMBOL_11_ = 11,                       /* '='  */
-  YYSYMBOL_12_ = 12,                       /* '+'  */
-  YYSYMBOL_13_ = 13,                       /* '('  */
-  YYSYMBOL_14_ = 14,                       /* ')'  */
-  YYSYMBOL_15_ = 15,                       /* ','  */
-  YYSYMBOL_YYACCEPT = 16,                  /* $accept  */
-  YYSYMBOL_program = 17,                   /* program  */
-  YYSYMBOL_statement = 18,                 /* statement  */
-  YYSYMBOL_assignment = 19,                /* assignment  */
-  YYSYMBOL_expr = 20,                      /* expr  */
-  YYSYMBOL_term = 21,                      /* term  */
-  YYSYMBOL_function_call = 22              /* function_call  */
+  YYSYMBOL_TOUPPER = 10,                   /* TOUPPER  */
+  YYSYMBOL_TOLOWER = 11,                   /* TOLOWER  */
+  YYSYMBOL_PADLEFT = 12,                   /* PADLEFT  */
+  YYSYMBOL_PADRIGHT = 13,                  /* PADRIGHT  */
+  YYSYMBOL_TRIM = 14,                      /* TRIM  */
+  YYSYMBOL_FIND = 15,                      /* FIND  */
+  YYSYMBOL_16_ = 16,                       /* ';'  */
+  YYSYMBOL_17_ = 17,                       /* '='  */
+  YYSYMBOL_18_ = 18,                       /* '+'  */
+  YYSYMBOL_19_ = 19,                       /* '('  */
+  YYSYMBOL_20_ = 20,                       /* ')'  */
+  YYSYMBOL_21_ = 21,                       /* ','  */
+  YYSYMBOL_YYACCEPT = 22,                  /* $accept  */
+  YYSYMBOL_program = 23,                   /* program  */
+  YYSYMBOL_statement = 24,                 /* statement  */
+  YYSYMBOL_assignment = 25,                /* assignment  */
+  YYSYMBOL_expr = 26,                      /* expr  */
+  YYSYMBOL_term = 27,                      /* term  */
+  YYSYMBOL_function_call = 28              /* function_call  */
 };
 typedef enum yysymbol_kind_t yysymbol_kind_t;
 
@@ -544,19 +563,19 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  2
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   37
+#define YYLAST   75
 
 /* YYNTOKENS -- Number of terminals.  */
-#define YYNTOKENS  16
+#define YYNTOKENS  22
 /* YYNNTS -- Number of nonterminals.  */
 #define YYNNTS  7
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  14
+#define YYNRULES  20
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  35
+#define YYNSTATES  69
 
 /* YYMAXUTOK -- Last valid token kind.  */
-#define YYMAXUTOK   264
+#define YYMAXUTOK   270
 
 
 /* YYTRANSLATE(TOKEN-NUM) -- Symbol number corresponding to TOKEN-NUM
@@ -574,9 +593,9 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
-      13,    14,     2,    12,    15,     2,     2,     2,     2,     2,
-       2,     2,     2,     2,     2,     2,     2,     2,     2,    10,
-       2,    11,     2,     2,     2,     2,     2,     2,     2,     2,
+      19,    20,     2,    18,    21,     2,     2,     2,     2,     2,
+       2,     2,     2,     2,     2,     2,     2,     2,     2,    16,
+       2,    17,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
@@ -596,15 +615,17 @@ static const yytype_int8 yytranslate[] =
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     2,     2,     2,     2,
        2,     2,     2,     2,     2,     2,     1,     2,     3,     4,
-       5,     6,     7,     8,     9
+       5,     6,     7,     8,     9,    10,    11,    12,    13,    14,
+      15
 };
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    51,    51,    52,    57,    62,    73,    83,    88,    97,
-     108,   113,   120,   131,   148
+       0,    55,    55,    56,    61,    66,    77,    87,    92,   101,
+     112,   117,   124,   135,   152,   168,   177,   186,   202,   219,
+     235
 };
 #endif
 
@@ -621,9 +642,10 @@ static const char *yysymbol_name (yysymbol_kind_t yysymbol) YY_ATTRIBUTE_UNUSED;
 static const char *const yytname[] =
 {
   "\"end of file\"", "error", "\"invalid token\"", "ID", "STRING_LITERAL",
-  "NUMBER", "LENGTH", "REVERSE", "SUBSTRING", "PALINDROME", "';'", "'='",
-  "'+'", "'('", "')'", "','", "$accept", "program", "statement",
-  "assignment", "expr", "term", "function_call", YY_NULLPTR
+  "NUMBER", "LENGTH", "REVERSE", "SUBSTRING", "PALINDROME", "TOUPPER",
+  "TOLOWER", "PADLEFT", "PADRIGHT", "TRIM", "FIND", "';'", "'='", "'+'",
+  "'('", "')'", "','", "$accept", "program", "statement", "assignment",
+  "expr", "term", "function_call", YY_NULLPTR
 };
 
 static const char *
@@ -633,7 +655,7 @@ yysymbol_name (yysymbol_kind_t yysymbol)
 }
 #endif
 
-#define YYPACT_NINF (-11)
+#define YYPACT_NINF (-24)
 
 #define yypact_value_is_default(Yyn) \
   ((Yyn) == YYPACT_NINF)
@@ -647,10 +669,13 @@ yysymbol_name (yysymbol_kind_t yysymbol)
    STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-     -11,    11,   -11,    -9,   -11,     3,    -3,   -11,   -11,   -11,
-      10,    12,    13,    14,     9,   -11,   -11,    -3,    -3,    -3,
-      -3,    -3,     4,     5,     0,     8,   -11,   -11,   -11,    19,
-     -11,    15,    23,    17,   -11
+     -24,    23,   -24,    -5,   -24,     9,     7,   -24,   -24,   -24,
+      32,    33,    34,    35,    36,    37,    38,    39,    40,    41,
+      10,   -24,   -24,     7,     7,     7,     7,     7,     7,     7,
+       7,     7,     7,     7,    18,    21,     6,    22,    25,    26,
+      11,    12,    29,    16,   -24,   -24,   -24,    56,   -24,   -24,
+     -24,    57,    58,   -24,     7,    14,    43,    44,    30,    61,
+      63,    64,   -24,    49,    50,    51,   -24,   -24,   -24
 };
 
 /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -659,21 +684,24 @@ static const yytype_int8 yypact[] =
 static const yytype_int8 yydefact[] =
 {
        3,     0,     1,     0,     2,     0,     0,     4,     9,     8,
-       0,     0,     0,     0,     5,     7,    10,     0,     0,     0,
-       0,     0,     0,     0,     0,     0,     6,    11,    12,     0,
-      14,     0,     0,     0,    13
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       5,     7,    10,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     0,     0,     0,     0,     0,     0,
+       0,     0,     0,     0,     6,    11,    12,     0,    14,    15,
+      16,     0,     0,    19,     0,     0,     0,     0,     0,     0,
+       0,     0,    20,     0,     0,     0,    13,    17,    18
 };
 
 /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -11,   -11,   -11,   -11,   -10,    16,   -11
+     -24,   -24,   -24,   -24,   -23,    42,   -24
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-       0,     1,     4,     5,    14,    15,    16
+       0,     1,     4,     5,    20,    21,    22
 };
 
 /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -681,42 +709,55 @@ static const yytype_int8 yydefgoto[] =
    number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_int8 yytable[] =
 {
-       8,     9,     6,    10,    11,    12,    13,    22,    23,    24,
-      25,     2,    21,     7,     3,    29,    21,    21,    27,    28,
-      21,    21,    30,    17,    31,    18,    19,    20,    33,     0,
-      32,    34,     0,     0,     0,     0,     0,    26
+      34,    35,    36,    37,    38,    39,    40,    41,    42,    43,
+       8,     9,     6,    10,    11,    12,    13,    14,    15,    16,
+      17,    18,    19,     2,    33,     7,     3,    47,    33,    33,
+      33,    58,    51,    52,    33,    59,    33,    54,    45,    33,
+      33,    46,    48,    33,    33,    49,    50,    33,    33,    53,
+      62,    23,    24,    25,    26,    27,    28,    29,    30,    31,
+      32,    55,    56,    57,    60,    61,    63,    64,    65,    66,
+      67,    68,     0,     0,     0,    44
 };
 
 static const yytype_int8 yycheck[] =
 {
-       3,     4,    11,     6,     7,     8,     9,    17,    18,    19,
-      20,     0,    12,    10,     3,    15,    12,    12,    14,    14,
-      12,    12,    14,    13,     5,    13,    13,    13,     5,    -1,
-      15,    14,    -1,    -1,    -1,    -1,    -1,    21
+      23,    24,    25,    26,    27,    28,    29,    30,    31,    32,
+       3,     4,    17,     6,     7,     8,     9,    10,    11,    12,
+      13,    14,    15,     0,    18,    16,     3,    21,    18,    18,
+      18,    54,    21,    21,    18,    21,    18,    21,    20,    18,
+      18,    20,    20,    18,    18,    20,    20,    18,    18,    20,
+      20,    19,    19,    19,    19,    19,    19,    19,    19,    19,
+      19,     5,     5,     5,    21,    21,     5,     4,     4,    20,
+      20,    20,    -1,    -1,    -1,    33
 };
 
 /* YYSTOS[STATE-NUM] -- The symbol kind of the accessing symbol of
    state STATE-NUM.  */
 static const yytype_int8 yystos[] =
 {
-       0,    17,     0,     3,    18,    19,    11,    10,     3,     4,
-       6,     7,     8,     9,    20,    21,    22,    13,    13,    13,
-      13,    12,    20,    20,    20,    20,    21,    14,    14,    15,
-      14,     5,    15,     5,    14
+       0,    23,     0,     3,    24,    25,    17,    16,     3,     4,
+       6,     7,     8,     9,    10,    11,    12,    13,    14,    15,
+      26,    27,    28,    19,    19,    19,    19,    19,    19,    19,
+      19,    19,    19,    18,    26,    26,    26,    26,    26,    26,
+      26,    26,    26,    26,    27,    20,    20,    21,    20,    20,
+      20,    21,    21,    20,    21,     5,     5,     5,    26,    21,
+      21,    21,    20,     5,     4,     4,    20,    20,    20
 };
 
 /* YYR1[RULE-NUM] -- Symbol kind of the left-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr1[] =
 {
-       0,    16,    17,    17,    18,    19,    20,    20,    21,    21,
-      21,    22,    22,    22,    22
+       0,    22,    23,    23,    24,    25,    26,    26,    27,    27,
+      27,    28,    28,    28,    28,    28,    28,    28,    28,    28,
+      28
 };
 
 /* YYR2[RULE-NUM] -- Number of symbols on the right-hand side of rule RULE-NUM.  */
 static const yytype_int8 yyr2[] =
 {
        0,     2,     2,     0,     2,     3,     3,     1,     1,     1,
-       1,     4,     4,     8,     4
+       1,     4,     4,     8,     4,     4,     4,     8,     8,     4,
+       6
 };
 
 
@@ -1180,7 +1221,7 @@ yyreduce:
   switch (yyn)
     {
   case 5: /* assignment: ID '=' expr  */
-#line 62 "string-compiler.y"
+#line 66 "string-compiler.y"
                    {
         /* Store the variable and its value in the symbol table. */
         set_var_value((yyvsp[-2].sval), (yyvsp[0].sval));
@@ -1188,11 +1229,11 @@ yyreduce:
         free((yyvsp[-2].sval));
         free((yyvsp[0].sval));
     }
-#line 1192 "y.tab.c"
+#line 1233 "y.tab.c"
     break;
 
   case 6: /* expr: expr '+' term  */
-#line 73 "string-compiler.y"
+#line 77 "string-compiler.y"
                      {
         /* Concatenate the two strings. */
         char* tmp = malloc(strlen((yyvsp[-2].sval)) + strlen((yyvsp[0].sval)) + 1);
@@ -1203,17 +1244,17 @@ yyreduce:
         free((yyvsp[-2].sval));
         free((yyvsp[0].sval));
     }
-#line 1207 "y.tab.c"
+#line 1248 "y.tab.c"
     break;
 
   case 7: /* expr: term  */
-#line 83 "string-compiler.y"
+#line 87 "string-compiler.y"
                     { (yyval.sval) = (yyvsp[0].sval); }
-#line 1213 "y.tab.c"
+#line 1254 "y.tab.c"
     break;
 
   case 8: /* term: STRING_LITERAL  */
-#line 88 "string-compiler.y"
+#line 92 "string-compiler.y"
                        {
         /* Remove the surrounding quotes from the string literal. */
         char* str = strdup((yyvsp[0].sval));
@@ -1223,11 +1264,11 @@ yyreduce:
         free(str);
         free((yyvsp[0].sval));
     }
-#line 1227 "y.tab.c"
+#line 1268 "y.tab.c"
     break;
 
   case 9: /* term: ID  */
-#line 97 "string-compiler.y"
+#line 101 "string-compiler.y"
                        {
         /* Retrieve the value of the variable from the symbol table. */
         char* val = get_var_value((yyvsp[0].sval));
@@ -1239,17 +1280,17 @@ yyreduce:
         }
         free((yyvsp[0].sval));  /* Free the memory allocated for the variable name */
     }
-#line 1243 "y.tab.c"
+#line 1284 "y.tab.c"
     break;
 
   case 10: /* term: function_call  */
-#line 108 "string-compiler.y"
+#line 112 "string-compiler.y"
                        { (yyval.sval) = (yyvsp[0].sval); }
-#line 1249 "y.tab.c"
+#line 1290 "y.tab.c"
     break;
 
   case 11: /* function_call: LENGTH '(' expr ')'  */
-#line 113 "string-compiler.y"
+#line 117 "string-compiler.y"
                            {
         /* Calculate the length of the string and convert it to a string. */
         char buffer[20];
@@ -1257,11 +1298,11 @@ yyreduce:
         (yyval.sval) = strdup(buffer);  /* Set the length as the function's result */
         free((yyvsp[-1].sval));             /* Free the memory allocated for the argument */
     }
-#line 1261 "y.tab.c"
+#line 1302 "y.tab.c"
     break;
 
   case 12: /* function_call: REVERSE '(' expr ')'  */
-#line 120 "string-compiler.y"
+#line 124 "string-compiler.y"
                             {
         /* Reverse the input string. */
         int len = strlen((yyvsp[-1].sval));
@@ -1273,11 +1314,11 @@ yyreduce:
         (yyval.sval) = reversed;         /* Set the reversed string as the function's result */
         free((yyvsp[-1].sval));              /* Free the memory allocated for the argument */
     }
-#line 1277 "y.tab.c"
+#line 1318 "y.tab.c"
     break;
 
   case 13: /* function_call: SUBSTRING '(' expr ',' NUMBER ',' NUMBER ')'  */
-#line 131 "string-compiler.y"
+#line 135 "string-compiler.y"
                                                    {
         /* Extract a substring from the input string between 'start' and 'end' indices. */
         int start = (yyvsp[-3].ival);  /* Starting index */
@@ -1295,11 +1336,11 @@ yyreduce:
         }
         free((yyvsp[-5].sval));  /* Free the memory allocated for the input string */
     }
-#line 1299 "y.tab.c"
+#line 1340 "y.tab.c"
     break;
 
   case 14: /* function_call: PALINDROME '(' expr ')'  */
-#line 148 "string-compiler.y"
+#line 152 "string-compiler.y"
                               {
         /* Check if the input string is a palindrome. */
         int len = strlen((yyvsp[-1].sval));
@@ -1316,11 +1357,123 @@ yyreduce:
             (yyval.sval) = strdup("false");  /* Set result to "false" */
         free((yyvsp[-1].sval));  /* Free the memory allocated for the input string */
     }
-#line 1320 "y.tab.c"
+#line 1361 "y.tab.c"
+    break;
+
+  case 15: /* function_call: TOUPPER '(' expr ')'  */
+#line 168 "string-compiler.y"
+                           {
+        int len = strlen((yyvsp[-1].sval));
+        char* upper_str = strdup((yyvsp[-1].sval));
+        for(int i = 0; i < len; i++) {
+            upper_str[i] = toupper(upper_str[i]);
+        }
+        (yyval.sval) = upper_str;
+        free((yyvsp[-1].sval));
+    }
+#line 1375 "y.tab.c"
+    break;
+
+  case 16: /* function_call: TOLOWER '(' expr ')'  */
+#line 177 "string-compiler.y"
+                           {
+        int len = strlen((yyvsp[-1].sval));
+        char* lower_str = strdup((yyvsp[-1].sval));
+        for(int i = 0; i < len; i++) {
+            lower_str[i] = tolower(lower_str[i]);
+        }
+        (yyval.sval) = lower_str;
+        free((yyvsp[-1].sval));
+    }
+#line 1389 "y.tab.c"
+    break;
+
+  case 17: /* function_call: PADLEFT '(' expr ',' NUMBER ',' STRING_LITERAL ')'  */
+#line 186 "string-compiler.y"
+                                                         {
+        int total_length = (yyvsp[-3].ival);
+        char pad_char = (yyvsp[-1].sval)[1]; // Extract the character from the string literal
+        int str_len = strlen((yyvsp[-5].sval));
+        if(total_length <= str_len) {
+            (yyval.sval) = strdup((yyvsp[-5].sval));
+        } else {
+            int pad_len = total_length - str_len;
+            char* padded_str = malloc(total_length + 1);
+            memset(padded_str, pad_char, pad_len);
+            strcpy(padded_str + pad_len, (yyvsp[-5].sval));
+            (yyval.sval) = padded_str;
+        }
+        free((yyvsp[-5].sval));
+        free((yyvsp[-1].sval));
+    }
+#line 1410 "y.tab.c"
+    break;
+
+  case 18: /* function_call: PADRIGHT '(' expr ',' NUMBER ',' STRING_LITERAL ')'  */
+#line 202 "string-compiler.y"
+                                                          {
+        int total_length = (yyvsp[-3].ival);
+        char pad_char = (yyvsp[-1].sval)[1];
+        int str_len = strlen((yyvsp[-5].sval));
+        if(total_length <= str_len) {
+            (yyval.sval) = strdup((yyvsp[-5].sval));
+        } else {
+            int pad_len = total_length - str_len;
+            char* padded_str = malloc(total_length + 1);
+            strcpy(padded_str, (yyvsp[-5].sval));
+            memset(padded_str + str_len, pad_char, pad_len);
+            padded_str[total_length] = '\0';
+            (yyval.sval) = padded_str;
+        }
+        free((yyvsp[-5].sval));
+        free((yyvsp[-1].sval));
+    }
+#line 1432 "y.tab.c"
+    break;
+
+  case 19: /* function_call: TRIM '(' expr ')'  */
+#line 219 "string-compiler.y"
+                        {
+        char* trimmed_str = strdup((yyvsp[-1].sval));
+        char* start = trimmed_str;
+        char* end = trimmed_str + strlen(trimmed_str) - 1;
+
+        // Trim leading whitespace
+        while(isspace((unsigned char)*start)) start++;
+
+        // Trim trailing whitespace
+        while(end > start && isspace((unsigned char)*end)) end--;
+        *(end + 1) = '\0';
+
+        (yyval.sval) = strdup(start);
+        free(trimmed_str);
+        free((yyvsp[-1].sval));
+    }
+#line 1453 "y.tab.c"
+    break;
+
+  case 20: /* function_call: FIND '(' expr ',' expr ')'  */
+#line 235 "string-compiler.y"
+                                 {
+        char* haystack = (yyvsp[-3].sval);
+        char* needle = (yyvsp[-1].sval);
+        char* pos = strstr(haystack, needle);
+        if(pos) {
+            int index = pos - haystack;
+            char buffer[20];
+            sprintf(buffer, "%d", index);
+            (yyval.sval) = strdup(buffer);
+        } else {
+            (yyval.sval) = strdup("-1");
+        }
+        free((yyvsp[-3].sval));
+        free((yyvsp[-1].sval));
+    }
+#line 1473 "y.tab.c"
     break;
 
 
-#line 1324 "y.tab.c"
+#line 1477 "y.tab.c"
 
       default: break;
     }
@@ -1513,7 +1666,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 167 "string-compiler.y"
+#line 253 "string-compiler.y"
 
 
 /* Function to retrieve the value of a variable from the symbol table. */

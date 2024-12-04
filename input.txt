@@ -1,9 +1,43 @@
-s1 = "hello";
-s2 = "world";
-s3 = s1 + " " + s2;
-s4 = reverse(s3);
-s5 = "openai";
-len = length(s3);
-pal = palindrome("madam");
-substr = substring(s3, 0, 5);
-pal_test = palindrome(s5);
+// Test Case Conversion
+s1 = "Hello World!";
+upper_s1 = toupper(s1);
+lower_s1 = tolower(s1);
+
+// Test String Padding
+pad_left = padleft(s1, 15, "*");
+pad_right = padright(s1, 15, "-");
+
+// Test String Trimming
+s2 = "   Leading and trailing spaces   ";
+trimmed_s2 = trim(s2);
+
+// Test String Searching
+s3 = "Find the substring in this string.";
+index_substring = find(s3, "substring");
+index_not_found = find(s3, "missing");
+
+// Test Combined Functions
+s4 = "   OpenAI GPT-4   ";
+processed_s4 = padright(trim(toupper(s4)), 20, "#");
+
+// Additional Tests
+// Padding with multiple characters (should use only the first character)
+pad_left_multi_char = padleft("Test", 10, "AB");
+pad_right_multi_char = padright("Test", 10, "XY");
+
+// Trimming string with no whitespace
+no_trim_needed = trim("NoSpaces");
+
+// Finding substring at the beginning and end
+index_start = find("Start and end", "Start");
+index_end = find("Start and end", "end");
+
+// Finding empty substring
+index_empty = find("Non-empty string", "");
+
+// Case-sensitive search
+index_case_sensitive = find("Case Sensitive", "case");
+
+// Pad to length less than string length
+pad_left_short = padleft("AlreadyLongString", 5, "*");
+pad_right_short = padright("AlreadyLongString", 5, "-");
