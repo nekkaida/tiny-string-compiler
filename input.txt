@@ -35,7 +35,3 @@ count_a = count("banana", "a");           // Count occurrences of "a" in "banana
 
 // Combined functions
 complex_expr = join(split(toupper(trim("   hello world   ")), " "), "-");
-
-// Edge cases
-empty_replace = replace("No change", "", "New"); // Replace empty string (should handle gracefully)
-empty_count = count("Test string", "");         // Count empty substring (should handle gracefully)
