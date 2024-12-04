@@ -21,12 +21,12 @@ extern int yylineno;        // Declare the external line number variable
 "reverse"          { return REVERSE; }      // Reverse function
 "substring"        { return SUBSTRING; }    // Substring function
 "palindrome"       { return PALINDROME; }   // Palindrome function
-"toupper"          { return TOUPPER; }      
-"tolower"          { return TOLOWER; }
-"padleft"          { return PADLEFT; }     
-"padright"         { return PADRIGHT; }    
-"trim"             { return TRIM; }        
-"find"             { return FIND; }        
+"toupper"          { return TOUPPER; }      // Convert string to uppercase
+"tolower"          { return TOLOWER; }      // Convert string to lowercase
+"padleft"          { return PADLEFT; }      // Pad string on the left
+"padright"         { return PADRIGHT; }     // Pad string on the right
+"trim"             { return TRIM; }         // Trim whitespace from both ends
+"find"             { return FIND; }         // Find substring within a string
 
 [a-zA-Z_][a-zA-Z0-9_]*  { yylval.sval = strdup(yytext); return ID; }  // Identifiers
 

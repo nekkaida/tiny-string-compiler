@@ -1,9 +1,9 @@
 %{
-/* Include standard C++ libraries needed for input/output and string manipulation. */
+/* Include standard C libraries needed for input/output, string manipulation, and character functions. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
+#include <ctype.h>    // For character functions like toupper, tolower, and isspace
 
 /* Define a maximum number of variables that can be stored. */
 #define MAX_VARS 100
@@ -40,16 +40,13 @@ void yyerror(const char *s);
 %token <sval> ID STRING_LITERAL  /* ID and STRING_LITERAL have string values */
 %token <ival> NUMBER             /* NUMBER has an integer value */
 %token LENGTH REVERSE SUBSTRING PALINDROME  /* Tokens for string functions */
-%token TOUPPER TOLOWER
-%token PADLEFT PADRIGHT TRIM
-%token FIND
+%token TOUPPER TOLOWER PADLEFT PADRIGHT TRIM FIND  /* Tokens for new string functions */
 
 /* Declare the types of non-terminal symbols used in the grammar rules. */
 %type <sval> expr term function_call
 
 /* Start of the grammar rules section. */
 %%
-
 /* The 'program' rule defines the structure of the program as a sequence of statements. */
 program:
     program statement   /* A program can be another program followed by a statement */
@@ -137,7 +134,7 @@ function_call:
         int start = $5;  /* Starting index */
         int end = $7;    /* Ending index */
         int len_str = strlen($3);
-        int len = end - start;  /* Length of the substring */
+        int len = end - start;
         if(len<0 || start<0 || end>len_str){
             yyerror("Invalid substring indices");  /* Report an error if indices are invalid */
             $$ = strdup("");  /* Set an empty string to prevent crashes */
@@ -166,86 +163,115 @@ function_call:
         free($3);  /* Free the memory allocated for the input string */
     }
     | TOUPPER '(' expr ')' {
+        /* Convert the input string to uppercase. */
         int len = strlen($3);
         char* upper_str = strdup($3);
         for(int i = 0; i < len; i++) {
-            upper_str[i] = toupper(upper_str[i]);
+            upper_str[i] = toupper((unsigned char)upper_str[i]);
         }
-        $$ = upper_str;
-        free($3);
+        $$ = upper_str;  /* Set the uppercase string as the function's result */
+        free($3);        /* Free the memory allocated for the input string */
     }
     | TOLOWER '(' expr ')' {
+        /* Convert the input string to lowercase. */
         int len = strlen($3);
         char* lower_str = strdup($3);
         for(int i = 0; i < len; i++) {
-            lower_str[i] = tolower(lower_str[i]);
+            lower_str[i] = tolower((unsigned char)lower_str[i]);
         }
-        $$ = lower_str;
-        free($3);
+        $$ = lower_str;  /* Set the lowercase string as the function's result */
+        free($3);        /* Free the memory allocated for the input string */
     }
     | PADLEFT '(' expr ',' NUMBER ',' STRING_LITERAL ')' {
-        int total_length = $5;
-        char pad_char = $7[1]; // Extract the character from the string literal
+        /* Pad the input string on the left with a character to reach the total length. */
+        int total_length = $5;  /* Desired total length */
+        /* Process the pad character string literal */
+        char* pad_str = strdup($7);
+        pad_str[strlen(pad_str)-1] = '\0';  /* Remove ending quote */
+        char* pad_content = &pad_str[1];    /* Remove starting quote */
+        char pad_char;
+        if (strlen(pad_content) >= 1) {
+            pad_char = pad_content[0];     /* Use the first character */
+        } else {
+            yyerror("Pad character must not be empty");
+            pad_char = ' ';  /* Default to space */
+        }
         int str_len = strlen($3);
         if(total_length <= str_len) {
-            $$ = strdup($3);
+            $$ = strdup($3);  /* Return the original string */
         } else {
             int pad_len = total_length - str_len;
             char* padded_str = malloc(total_length + 1);
-            memset(padded_str, pad_char, pad_len);
-            strcpy(padded_str + pad_len, $3);
+            memset(padded_str, pad_char, pad_len);       /* Fill with pad_char */
+            strcpy(padded_str + pad_len, $3);            /* Copy the original string */
+            padded_str[total_length] = '\0';             /* Null-terminate */
             $$ = padded_str;
         }
+        free(pad_str);
         free($3);
         free($7);
     }
     | PADRIGHT '(' expr ',' NUMBER ',' STRING_LITERAL ')' {
-        int total_length = $5;
-        char pad_char = $7[1];
+        /* Pad the input string on the right with a character to reach the total length. */
+        int total_length = $5;  /* Desired total length */
+        /* Process the pad character string literal */
+        char* pad_str = strdup($7);
+        pad_str[strlen(pad_str)-1] = '\0';  /* Remove ending quote */
+        char* pad_content = &pad_str[1];    /* Remove starting quote */
+        char pad_char;
+        if (strlen(pad_content) >= 1) {
+            pad_char = pad_content[0];     /* Use the first character */
+        } else {
+            yyerror("Pad character must not be empty");
+            pad_char = ' ';  /* Default to space */
+        }
         int str_len = strlen($3);
         if(total_length <= str_len) {
-            $$ = strdup($3);
+            $$ = strdup($3);  /* Return the original string */
         } else {
             int pad_len = total_length - str_len;
             char* padded_str = malloc(total_length + 1);
-            strcpy(padded_str, $3);
-            memset(padded_str + str_len, pad_char, pad_len);
-            padded_str[total_length] = '\0';
+            strcpy(padded_str, $3);                        /* Copy the original string */
+            memset(padded_str + str_len, pad_char, pad_len); /* Fill with pad_char */
+            padded_str[total_length] = '\0';               /* Null-terminate */
             $$ = padded_str;
         }
+        free(pad_str);
         free($3);
         free($7);
     }
     | TRIM '(' expr ')' {
+        /* Trim leading and trailing whitespace from the input string. */
         char* trimmed_str = strdup($3);
         char* start = trimmed_str;
         char* end = trimmed_str + strlen(trimmed_str) - 1;
 
-        // Trim leading whitespace
+        /* Trim leading whitespace */
         while(isspace((unsigned char)*start)) start++;
 
-        // Trim trailing whitespace
-        while(end > start && isspace((unsigned char)*end)) end--;
-        *(end + 1) = '\0';
+        /* Trim trailing whitespace */
+        while(end >= start && isspace((unsigned char)*end)) end--;
+        *(end + 1) = '\0';  /* Null-terminate after the last non-space character */
 
-        $$ = strdup(start);
-        free(trimmed_str);
-        free($3);
+        $$ = strdup(start);  /* Set the trimmed string as the function's result */
+        free(trimmed_str);   /* Free the temporary string */
+        free($3);            /* Free the memory allocated for the input string */
     }
     | FIND '(' expr ',' expr ')' {
-        char* haystack = $3;
-        char* needle = $5;
-        char* pos = strstr(haystack, needle);
+        /* Find the index of the substring within the input string. */
+        char* haystack = $3;  /* The string to search in */
+        char* needle = $5;    /* The substring to find */
+        char* pos = strstr(haystack, needle);  /* Find the substring */
         if(pos) {
-            int index = pos - haystack;
+            int index = pos - haystack;  /* Calculate the index */
             char buffer[20];
             sprintf(buffer, "%d", index);
-            $$ = strdup(buffer);
+            $$ = strdup(buffer);  /* Set the index as the function's result */
         } else {
-            $$ = strdup("-1");
+            $$ = strdup("-1");  /* Return -1 if the substring is not found */
         }
-        free($3);
-        free($5);
+        free($3);  /* Free the memory allocated for the haystack string */
+        free($5);  /* Free the memory allocated for the needle string */
     }
     ;
 

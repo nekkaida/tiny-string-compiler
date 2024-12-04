@@ -842,32 +842,32 @@ YY_RULE_SETUP
 case 14:
 YY_RULE_SETUP
 #line 24 "string-compiler.l"
-{ return TOUPPER; }      
+{ return TOUPPER; }      // Convert string to uppercase
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
 #line 25 "string-compiler.l"
-{ return TOLOWER; }
+{ return TOLOWER; }      // Convert string to lowercase
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
 #line 26 "string-compiler.l"
-{ return PADLEFT; }     
+{ return PADLEFT; }      // Pad string on the left
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
 #line 27 "string-compiler.l"
-{ return PADRIGHT; }    
+{ return PADRIGHT; }     // Pad string on the right
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
 #line 28 "string-compiler.l"
-{ return TRIM; }        
+{ return TRIM; }         // Trim whitespace from both ends
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 29 "string-compiler.l"
-{ return FIND; }        
+{ return FIND; }         // Find substring within a string
 	YY_BREAK
 case 20:
 YY_RULE_SETUP

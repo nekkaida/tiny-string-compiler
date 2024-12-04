@@ -69,11 +69,11 @@
 /* First part of user prologue.  */
 #line 1 "string-compiler.y"
 
-/* Include standard C++ libraries needed for input/output and string manipulation. */
+/* Include standard C libraries needed for input/output, string manipulation, and character functions. */
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <ctype.h>
+#include <ctype.h>    // For character functions like toupper, tolower, and isspace
 
 /* Define a maximum number of variables that can be stored. */
 #define MAX_VARS 100
@@ -621,11 +621,11 @@ static const yytype_int8 yytranslate[] =
 
 #if YYDEBUG
 /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
-static const yytype_uint8 yyrline[] =
+static const yytype_int16 yyrline[] =
 {
-       0,    55,    55,    56,    61,    66,    77,    87,    92,   101,
-     112,   117,   124,   135,   152,   168,   177,   186,   202,   219,
-     235
+       0,    52,    52,    53,    58,    63,    74,    84,    89,    98,
+     109,   114,   121,   132,   149,   165,   175,   185,   214,   243,
+     260
 };
 #endif
 
@@ -1221,7 +1221,7 @@ yyreduce:
   switch (yyn)
     {
   case 5: /* assignment: ID '=' expr  */
-#line 66 "string-compiler.y"
+#line 63 "string-compiler.y"
                    {
         /* Store the variable and its value in the symbol table. */
         set_var_value((yyvsp[-2].sval), (yyvsp[0].sval));
@@ -1233,7 +1233,7 @@ yyreduce:
     break;
 
   case 6: /* expr: expr '+' term  */
-#line 77 "string-compiler.y"
+#line 74 "string-compiler.y"
                      {
         /* Concatenate the two strings. */
         char* tmp = malloc(strlen((yyvsp[-2].sval)) + strlen((yyvsp[0].sval)) + 1);
@@ -1248,13 +1248,13 @@ yyreduce:
     break;
 
   case 7: /* expr: term  */
-#line 87 "string-compiler.y"
+#line 84 "string-compiler.y"
                     { (yyval.sval) = (yyvsp[0].sval); }
 #line 1254 "y.tab.c"
     break;
 
   case 8: /* term: STRING_LITERAL  */
-#line 92 "string-compiler.y"
+#line 89 "string-compiler.y"
                        {
         /* Remove the surrounding quotes from the string literal. */
         char* str = strdup((yyvsp[0].sval));
@@ -1268,7 +1268,7 @@ yyreduce:
     break;
 
   case 9: /* term: ID  */
-#line 101 "string-compiler.y"
+#line 98 "string-compiler.y"
                        {
         /* Retrieve the value of the variable from the symbol table. */
         char* val = get_var_value((yyvsp[0].sval));
@@ -1284,13 +1284,13 @@ yyreduce:
     break;
 
   case 10: /* term: function_call  */
-#line 112 "string-compiler.y"
+#line 109 "string-compiler.y"
                        { (yyval.sval) = (yyvsp[0].sval); }
 #line 1290 "y.tab.c"
     break;
 
   case 11: /* function_call: LENGTH '(' expr ')'  */
-#line 117 "string-compiler.y"
+#line 114 "string-compiler.y"
                            {
         /* Calculate the length of the string and convert it to a string. */
         char buffer[20];
@@ -1302,7 +1302,7 @@ yyreduce:
     break;
 
   case 12: /* function_call: REVERSE '(' expr ')'  */
-#line 124 "string-compiler.y"
+#line 121 "string-compiler.y"
                             {
         /* Reverse the input string. */
         int len = strlen((yyvsp[-1].sval));
@@ -1318,13 +1318,13 @@ yyreduce:
     break;
 
   case 13: /* function_call: SUBSTRING '(' expr ',' NUMBER ',' NUMBER ')'  */
-#line 135 "string-compiler.y"
+#line 132 "string-compiler.y"
                                                    {
         /* Extract a substring from the input string between 'start' and 'end' indices. */
         int start = (yyvsp[-3].ival);  /* Starting index */
         int end = (yyvsp[-1].ival);    /* Ending index */
         int len_str = strlen((yyvsp[-5].sval));
-        int len = end - start;  /* Length of the substring */
+        int len = end - start;
         if(len<0 || start<0 || end>len_str){
             yyerror("Invalid substring indices");  /* Report an error if indices are invalid */
             (yyval.sval) = strdup("");  /* Set an empty string to prevent crashes */
@@ -1340,7 +1340,7 @@ yyreduce:
     break;
 
   case 14: /* function_call: PALINDROME '(' expr ')'  */
-#line 152 "string-compiler.y"
+#line 149 "string-compiler.y"
                               {
         /* Check if the input string is a palindrome. */
         int len = strlen((yyvsp[-1].sval));
@@ -1361,119 +1361,148 @@ yyreduce:
     break;
 
   case 15: /* function_call: TOUPPER '(' expr ')'  */
-#line 168 "string-compiler.y"
+#line 165 "string-compiler.y"
                            {
+        /* Convert the input string to uppercase. */
         int len = strlen((yyvsp[-1].sval));
         char* upper_str = strdup((yyvsp[-1].sval));
         for(int i = 0; i < len; i++) {
-            upper_str[i] = toupper(upper_str[i]);
+            upper_str[i] = toupper((unsigned char)upper_str[i]);
         }
-        (yyval.sval) = upper_str;
-        free((yyvsp[-1].sval));
+        (yyval.sval) = upper_str;  /* Set the uppercase string as the function's result */
+        free((yyvsp[-1].sval));        /* Free the memory allocated for the input string */
     }
-#line 1375 "y.tab.c"
+#line 1376 "y.tab.c"
     break;
 
   case 16: /* function_call: TOLOWER '(' expr ')'  */
-#line 177 "string-compiler.y"
+#line 175 "string-compiler.y"
                            {
+        /* Convert the input string to lowercase. */
         int len = strlen((yyvsp[-1].sval));
         char* lower_str = strdup((yyvsp[-1].sval));
         for(int i = 0; i < len; i++) {
-            lower_str[i] = tolower(lower_str[i]);
+            lower_str[i] = tolower((unsigned char)lower_str[i]);
         }
-        (yyval.sval) = lower_str;
-        free((yyvsp[-1].sval));
+        (yyval.sval) = lower_str;  /* Set the lowercase string as the function's result */
+        free((yyvsp[-1].sval));        /* Free the memory allocated for the input string */
     }
-#line 1389 "y.tab.c"
+#line 1391 "y.tab.c"
     break;
 
   case 17: /* function_call: PADLEFT '(' expr ',' NUMBER ',' STRING_LITERAL ')'  */
-#line 186 "string-compiler.y"
+#line 185 "string-compiler.y"
                                                          {
-        int total_length = (yyvsp[-3].ival);
-        char pad_char = (yyvsp[-1].sval)[1]; // Extract the character from the string literal
+        /* Pad the input string on the left with a character to reach the total length. */
+        int total_length = (yyvsp[-3].ival);  /* Desired total length */
+        /* Process the pad character string literal */
+        char* pad_str = strdup((yyvsp[-1].sval));
+        pad_str[strlen(pad_str)-1] = '\0';  /* Remove ending quote */
+        char* pad_content = &pad_str[1];    /* Remove starting quote */
+        char pad_char;
+        if (strlen(pad_content) >= 1) {
+            pad_char = pad_content[0];     /* Use the first character */
+        } else {
+            yyerror("Pad character must not be empty");
+            pad_char = ' ';  /* Default to space */
+        }
         int str_len = strlen((yyvsp[-5].sval));
         if(total_length <= str_len) {
-            (yyval.sval) = strdup((yyvsp[-5].sval));
+            (yyval.sval) = strdup((yyvsp[-5].sval));  /* Return the original string */
         } else {
             int pad_len = total_length - str_len;
             char* padded_str = malloc(total_length + 1);
-            memset(padded_str, pad_char, pad_len);
-            strcpy(padded_str + pad_len, (yyvsp[-5].sval));
+            memset(padded_str, pad_char, pad_len);       /* Fill with pad_char */
+            strcpy(padded_str + pad_len, (yyvsp[-5].sval));            /* Copy the original string */
+            padded_str[total_length] = '\0';             /* Null-terminate */
             (yyval.sval) = padded_str;
         }
+        free(pad_str);
         free((yyvsp[-5].sval));
         free((yyvsp[-1].sval));
     }
-#line 1410 "y.tab.c"
+#line 1425 "y.tab.c"
     break;
 
   case 18: /* function_call: PADRIGHT '(' expr ',' NUMBER ',' STRING_LITERAL ')'  */
-#line 202 "string-compiler.y"
+#line 214 "string-compiler.y"
                                                           {
-        int total_length = (yyvsp[-3].ival);
-        char pad_char = (yyvsp[-1].sval)[1];
+        /* Pad the input string on the right with a character to reach the total length. */
+        int total_length = (yyvsp[-3].ival);  /* Desired total length */
+        /* Process the pad character string literal */
+        char* pad_str = strdup((yyvsp[-1].sval));
+        pad_str[strlen(pad_str)-1] = '\0';  /* Remove ending quote */
+        char* pad_content = &pad_str[1];    /* Remove starting quote */
+        char pad_char;
+        if (strlen(pad_content) >= 1) {
+            pad_char = pad_content[0];     /* Use the first character */
+        } else {
+            yyerror("Pad character must not be empty");
+            pad_char = ' ';  /* Default to space */
+        }
         int str_len = strlen((yyvsp[-5].sval));
         if(total_length <= str_len) {
-            (yyval.sval) = strdup((yyvsp[-5].sval));
+            (yyval.sval) = strdup((yyvsp[-5].sval));  /* Return the original string */
         } else {
             int pad_len = total_length - str_len;
             char* padded_str = malloc(total_length + 1);
-            strcpy(padded_str, (yyvsp[-5].sval));
-            memset(padded_str + str_len, pad_char, pad_len);
-            padded_str[total_length] = '\0';
+            strcpy(padded_str, (yyvsp[-5].sval));                        /* Copy the original string */
+            memset(padded_str + str_len, pad_char, pad_len); /* Fill with pad_char */
+            padded_str[total_length] = '\0';               /* Null-terminate */
             (yyval.sval) = padded_str;
         }
+        free(pad_str);
         free((yyvsp[-5].sval));
         free((yyvsp[-1].sval));
     }
-#line 1432 "y.tab.c"
+#line 1459 "y.tab.c"
     break;
 
   case 19: /* function_call: TRIM '(' expr ')'  */
-#line 219 "string-compiler.y"
+#line 243 "string-compiler.y"
                         {
+        /* Trim leading and trailing whitespace from the input string. */
         char* trimmed_str = strdup((yyvsp[-1].sval));
         char* start = trimmed_str;
         char* end = trimmed_str + strlen(trimmed_str) - 1;
 
-        // Trim leading whitespace
+        /* Trim leading whitespace */
         while(isspace((unsigned char)*start)) start++;
 
-        // Trim trailing whitespace
-        while(end > start && isspace((unsigned char)*end)) end--;
-        *(end + 1) = '\0';
+        /* Trim trailing whitespace */
+        while(end >= start && isspace((unsigned char)*end)) end--;
+        *(end + 1) = '\0';  /* Null-terminate after the last non-space character */
 
-        (yyval.sval) = strdup(start);
-        free(trimmed_str);
-        free((yyvsp[-1].sval));
+        (yyval.sval) = strdup(start);  /* Set the trimmed string as the function's result */
+        free(trimmed_str);   /* Free the temporary string */
+        free((yyvsp[-1].sval));            /* Free the memory allocated for the input string */
     }
-#line 1453 "y.tab.c"
+#line 1481 "y.tab.c"
     break;
 
   case 20: /* function_call: FIND '(' expr ',' expr ')'  */
-#line 235 "string-compiler.y"
+#line 260 "string-compiler.y"
                                  {
-        char* haystack = (yyvsp[-3].sval);
-        char* needle = (yyvsp[-1].sval);
-        char* pos = strstr(haystack, needle);
+        /* Find the index of the substring within the input string. */
+        char* haystack = (yyvsp[-3].sval);  /* The string to search in */
+        char* needle = (yyvsp[-1].sval);    /* The substring to find */
+        char* pos = strstr(haystack, needle);  /* Find the substring */
         if(pos) {
-            int index = pos - haystack;
+            int index = pos - haystack;  /* Calculate the index */
             char buffer[20];
             sprintf(buffer, "%d", index);
-            (yyval.sval) = strdup(buffer);
+            (yyval.sval) = strdup(buffer);  /* Set the index as the function's result */
         } else {
-            (yyval.sval) = strdup("-1");
+            (yyval.sval) = strdup("-1");  /* Return -1 if the substring is not found */
         }
-        free((yyvsp[-3].sval));
-        free((yyvsp[-1].sval));
+        free((yyvsp[-3].sval));  /* Free the memory allocated for the haystack string */
+        free((yyvsp[-1].sval));  /* Free the memory allocated for the needle string */
     }
-#line 1473 "y.tab.c"
+#line 1502 "y.tab.c"
     break;
 
 
-#line 1477 "y.tab.c"
+#line 1506 "y.tab.c"
 
       default: break;
     }
@@ -1666,7 +1695,7 @@ yyreturnlab:
   return yyresult;
 }
 
-#line 253 "string-compiler.y"
+#line 279 "string-compiler.y"
 
 
 /* Function to retrieve the value of a variable from the symbol table. */
